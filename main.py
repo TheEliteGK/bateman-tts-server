@@ -6,16 +6,13 @@ import uvicorn
 
 app = FastAPI()
 
-# ✅ Your ElevenLabs API Key & Voice ID — hardcoded for now
-ELEVENLABS_API_KEY = "sk_5d58ceb8f5dc7e87c71563957010b1c28616336496210636"
-VOICE_ID = "bIHbv24MWmeRgasZH58o"
+# ✅ Hardcoded or use env vars — your choice
+ELEVENLABS_API_KEY = os.environ.get("ELEVENLABS_API_KEY")
+VOICE_ID = os.environ.get("VOICE_ID")
+GROUP_ID = "16610227"  # Your group ID
 
-# ✅ Your Roblox Group ID
-GROUP_ID = "16610227"
-
-# ✅ Upload function
+# ✅ Upload to Roblox function — CORRECT FIELD NAMES
 def upload_to_roblox(filename):
-    # Get your Open Cloud API Key from the environment
     api_key = os.environ.get("ROBLOX_API_KEY")
 
     with open(filename, "rb") as f:
@@ -28,7 +25,7 @@ def upload_to_roblox(filename):
     }
 
     files = {
-        'file': ('voice.mp3', audio_data, 'audio/mpeg')
+        "fileContent": ("voice.mp3", audio_data, "audio/mpeg")
     }
 
     data = {
@@ -38,7 +35,6 @@ def upload_to_roblox(filename):
         "groupId": GROUP_ID
     }
 
-    # Upload as multipart/form-data
     response = requests.post(url, headers=headers, files=files, data=data)
 
     print("Roblox Upload Status:", response.status_code)
@@ -83,9 +79,10 @@ async def tts(request: Request):
     else:
         return {"error": "Roblox upload failed"}
 
-# ✅ Optional: Run locally for testing
+# ✅ Local run
 if __name__ == "__main__":
     uvicorn.run("main:app", host="0.0.0.0", port=8080, reload=True)
+
 
 
 
