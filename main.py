@@ -5,7 +5,6 @@ import os
 
 app = FastAPI()
 
-# 🔑 Your real API Key & Voice ID
 ELEVENLABS_API_KEY = "sk_5d58ceb8f5dc7e87c71563957010b1c28616336496210636"
 VOICE_ID = "bIHbv24MWmeRgasZH58o"
 
@@ -23,20 +22,23 @@ async def tts(request: Request):
         json={"text": text}
     )
 
+    # ✅ PRINT the real ElevenLabs response
+    print("ElevenLabs response status:", response.status_code)
+    print("ElevenLabs response text:", response.text)
+
     if response.status_code != 200:
         return {"error": "TTS failed"}
 
-    # ✅ Make sure 'static' folder exists and save audio INSIDE the function!
     os.makedirs("static", exist_ok=True)
     filename = f"{uuid.uuid4()}.mp3"
     with open(f"static/{filename}", "wb") as f:
         f.write(response.content)
 
-    # ✅ Give back link
     return {"url": f"https://bateman-tts-server.onrender.com/static/{filename}"}
 
 import uvicorn
 
 if __name__ == "__main__":
     uvicorn.run("main:app", host="0.0.0.0", port=8080, reload=True)
+
 
