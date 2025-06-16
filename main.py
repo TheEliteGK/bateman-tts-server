@@ -6,10 +6,10 @@ import os
 app = FastAPI()
 
 # 🔑 ADD YOUR ELEVENLABS KEY HERE:
-ELEVENLABS_API_KEY = "sk_65b3657f8bdbdfe139c5e87498dc1b1e7a459cd2bd41380e"
+ELEVENLABS_API_KEY = "sk_5d58ceb8f5dc7e87c71563957010b1c28616336496210636"
 
 # 🔑 ADD YOUR VOICE ID HERE:
-VOICE_ID = "gOkFV1JMCt0G0n9xmBwV"
+VOICE_ID = "bIHbv24MWmeRgasZH58o"
 
 
 @app.post("/tts")
@@ -34,7 +34,8 @@ async def tts(request: Request):
         f.write(response.content)
 
     # Give back link
-    return {"url": f"https://YOUR_REPLIT_URL/static/{filename}"}
+    return {"url": f"https://bateman-tts-server.onrender.com/static/{filename}"}
+
 
 import uvicorn
 
