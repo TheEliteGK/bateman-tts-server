@@ -6,12 +6,12 @@ import uvicorn
 
 app = FastAPI()
 
-# ✅ Hardcoded or use env vars — your choice
+# ✅ Use env vars or hardcode for test
 ELEVENLABS_API_KEY = os.environ.get("ELEVENLABS_API_KEY")
 VOICE_ID = os.environ.get("VOICE_ID")
 GROUP_ID = "16610227"  # Your group ID
 
-# ✅ Upload to Roblox function — CORRECT FIELD NAMES
+# ✅ Upload to Roblox — WAV version
 def upload_to_roblox(filename):
     api_key = os.environ.get("ROBLOX_API_KEY")
 
@@ -25,7 +25,7 @@ def upload_to_roblox(filename):
     }
 
     files = {
-        "fileContent": ("voice.mp3", audio_data, "audio/mpeg")
+        "fileContent": ("voice.wav", audio_data, "audio/wav")
     }
 
     data = {
@@ -45,7 +45,7 @@ def upload_to_roblox(filename):
     else:
         return None
 
-# ✅ TTS route
+# ✅ TTS route — request WAV from ElevenLabs
 @app.post("/tts")
 async def tts(request: Request):
     data = await request.json()
@@ -54,24 +54,29 @@ async def tts(request: Request):
     if not text:
         return {"error": "No text provided"}
 
-    # Call ElevenLabs
+    # ✅ Request WAV format explicitly
     response = requests.post(
         f"https://api.elevenlabs.io/v1/text-to-speech/{VOICE_ID}/stream",
         headers={"xi-api-key": ELEVENLABS_API_KEY},
-        json={"text": text}
+        json={
+            "text": text,
+            "voice_settings": {
+                "audio_format": "wav"
+            }
+        }
     )
 
     print("ElevenLabs Status:", response.status_code)
     if response.status_code != 200:
         return {"error": "TTS failed"}
 
-    # Save MP3 locally
+    # ✅ Save as WAV
     os.makedirs("static", exist_ok=True)
-    filename = f"static/{uuid.uuid4()}.mp3"
+    filename = f"static/{uuid.uuid4()}.wav"
     with open(filename, "wb") as f:
         f.write(response.content)
 
-    # Upload to Roblox
+    # ✅ Upload to Roblox
     asset_id = upload_to_roblox(filename)
 
     if asset_id:
